@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export default function Hero() {
   return (
     <section className="relative isolate flex min-h-[360px] items-center justify-center overflow-hidden bg-[#17365f] sm:min-h-[420px] lg:min-h-[460px]">

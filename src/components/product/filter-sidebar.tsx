@@ -3,7 +3,6 @@
 import { useState } from "react";
 import {
   Check,
-  ChevronDown,
   Filter,
   RotateCcw,
 } from "lucide-react";

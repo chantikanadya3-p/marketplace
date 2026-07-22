@@ -38,17 +38,16 @@ export default function Navbar() {
   const [isPromoVisible, setIsPromoVisible] =
     useState(true);
 
-  const cartItems = useAppSelector(
-    (state) => state.cart.items,
-  );
-
-  const totalItems = cartItems.reduce(
-    (total, item) => total + item.quantity,
-    0,
+  const totalItems = useAppSelector((state) =>
+    state.cart.items.reduce(
+      (total, item) =>
+        total + item.quantity,
+      0,
+    ),
   );
 
   const displayedCartCount =
-  totalItems > 0 ? totalItems : 3;
+    totalItems > 99 ? "99+" : totalItems;
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -102,105 +101,110 @@ export default function Navbar() {
         </div>
       )}
 
-<div className="w-full border-b border-[#E5E7EB] bg-white">
-  <nav className="mx-auto flex h-[53px] w-full max-w-[1440px] items-center justify-between px-4 sm:h-[72px] sm:px-8 lg:px-16">        <div className="flex items-center gap-10">
-          <Link
-            href="/"
-            onClick={closeMenu}
-            className="text-sm font-bold tracking-tight text-[#17365f] sm:text-xl"
-          >
-            TJERMIN
-          </Link>
+      <div className="w-full border-b border-[#E5E7EB] bg-white">
+        <nav className="mx-auto flex h-[53px] w-full max-w-[1440px] items-center justify-between px-4 sm:h-[72px] sm:px-8 lg:px-16">
+          <div className="flex items-center gap-10">
+            <Link
+              href="/"
+              onClick={closeMenu}
+              className="text-sm font-bold tracking-tight text-[#17365f] sm:text-xl"
+            >
+              TJERMIN
+            </Link>
 
-          <div className="hidden items-center gap-7 md:flex">
-            {navigationItems.map(
-              (item, index) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className={`text-sm transition-colors hover:text-[#17365f] ${
-                    index === 0
-                      ? "font-medium text-[#17365f]"
-                      : "text-slate-500"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ),
-            )}
+            <div className="hidden items-center gap-7 md:flex">
+              {navigationItems.map(
+                (item, index) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={`text-sm transition-colors hover:text-[#17365f] ${
+                      index === 0
+                        ? "font-medium text-[#17365f]"
+                        : "text-slate-500"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ),
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-1 text-[#17365f] sm:gap-3">
-          <button
-            type="button"
-            aria-label="Search products"
-            className="flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-slate-100"
-          >
-            <Search
-              size={17}
-              strokeWidth={1.8}
-            />
-          </button>
-
-          <button
-            type="button"
-            aria-label="User account"
-            className="hidden h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-slate-100 sm:flex"
-          >
-            <UserRound
-              size={18}
-              strokeWidth={1.8}
-            />
-          </button>
-
-          <Link
-            href="/cart"
-            aria-label={`Shopping cart with ${displayedCartCount} items`}
-            className="relative flex h-9 w-9 items-center justify-center rounded-md text-[#17365f] transition-colors hover:bg-slate-100"
-          >
-            <ShoppingCart
-              size={19}
-              strokeWidth={1.8}
-            />
-
-              <span className="absolute -right-1 -top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#17365f] px-1 text-[11px] font-bold leading-none text-white">
-          {displayedCartCount > 99
-            ? "99+"
-            : displayedCartCount}
-        </span>
-          </Link>
-
-          <button
-            type="button"
-            onClick={() =>
-              setIsMenuOpen(
-                (current) => !current,
-              )
-            }
-            aria-label={
-              isMenuOpen
-                ? "Close navigation menu"
-                : "Open navigation menu"
-            }
-            aria-expanded={isMenuOpen}
-            className="flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-slate-100 md:hidden"
-          >
-            {isMenuOpen ? (
-              <X
-                size={20}
+          <div className="flex items-center gap-1 text-[#17365f] sm:gap-3">
+            <button
+              type="button"
+              aria-label="Search products"
+              className="flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-slate-100"
+            >
+              <Search
+                size={17}
                 strokeWidth={1.8}
               />
-            ) : (
-              <Menu
-                size={20}
+            </button>
+
+            <button
+              type="button"
+              aria-label="User account"
+              className="hidden h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-slate-100 sm:flex"
+            >
+              <UserRound
+                size={18}
                 strokeWidth={1.8}
               />
-            )}
-          </button>
-        </div>
-      </nav>
-        </div>
+            </button>
+
+            <Link
+              href="/cart"
+              aria-label={
+                totalItems > 0
+                  ? `Shopping cart with ${totalItems} items`
+                  : "Shopping cart is empty"
+              }
+              className="relative flex h-9 w-9 items-center justify-center rounded-md text-[#17365f] transition-colors hover:bg-slate-100"
+            >
+              <ShoppingCart
+                size={19}
+                strokeWidth={1.8}
+              />
+
+             {totalItems > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#17365f] px-1 text-[10px] font-bold leading-none text-white">
+                  {displayedCartCount}
+                </span>
+              )}
+            </Link>
+
+            <button
+              type="button"
+              onClick={() =>
+                setIsMenuOpen(
+                  (current) => !current,
+                )
+              }
+              aria-label={
+                isMenuOpen
+                  ? "Close navigation menu"
+                  : "Open navigation menu"
+              }
+              aria-expanded={isMenuOpen}
+              className="flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-slate-100 md:hidden"
+            >
+              {isMenuOpen ? (
+                <X
+                  size={20}
+                  strokeWidth={1.8}
+                />
+              ) : (
+                <Menu
+                  size={20}
+                  strokeWidth={1.8}
+                />
+              )}
+            </button>
+          </div>
+        </nav>
+      </div>
 
       {isMenuOpen && (
         <div className="border-b border-[#E5E7EB] bg-white px-4 py-3 shadow-lg md:hidden">

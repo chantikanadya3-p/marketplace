@@ -127,8 +127,6 @@ function ViewButtons({
 }
 
 export default function ProductToolbar({
-  resultCount,
-  totalCount,
   categoryLabel,
   sortBy,
   viewMode,
