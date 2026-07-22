@@ -143,10 +143,25 @@ export default function ProductGrid() {
     setSelectedPriceRange("all");
   };
 
+    const categoryLabel =
+    selectedCategory === "all"
+      ? "All Category"
+      : selectedCategory
+          .split(" ")
+          .map(
+            (word) =>
+              word.charAt(0).toUpperCase() +
+              word.slice(1),
+          )
+          .join(" ");
+
   if (isError) {
     return (
       <div className="flex min-h-80 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 px-5 text-center">
-        <AlertCircle size={36} className="text-red-500" />
+        <AlertCircle
+          size={36}
+          className="text-red-500"
+        />
 
         <h3 className="mt-4 text-lg font-semibold text-slate-900">
           Unable to load products
@@ -169,7 +184,8 @@ export default function ProductGrid() {
   }
 
   return (
-<div className="grid items-start gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-8">      <FilterSidebar
+    <div className="grid items-start gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8">
+      <FilterSidebar
         categories={categories}
         selectedCategory={selectedCategory}
         selectedPriceRange={selectedPriceRange}
@@ -182,6 +198,7 @@ export default function ProductGrid() {
         <ProductToolbar
           resultCount={displayedProducts.length}
           totalCount={products.length}
+          categoryLabel={categoryLabel}
           sortBy={sortBy}
           viewMode={viewMode}
           onSortChange={setSortBy}
@@ -190,19 +207,23 @@ export default function ProductGrid() {
 
         {isPending ? (
           <div className={getGridClass(viewMode)}>
-            {Array.from({ length: 6 }).map((_, index) => (
-              <ProductCardSkeleton key={index} />
-            ))}
+            {Array.from({ length: 6 }).map(
+              (_, index) => (
+                <ProductCardSkeleton key={index} />
+              ),
+            )}
           </div>
         ) : displayedProducts.length > 0 ? (
           <div className={getGridClass(viewMode)}>
-            {displayedProducts.map((product, index) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                index={index}
-              />
-            ))}
+            {displayedProducts.map(
+              (product, index) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  index={index}
+                />
+              ),
+            )}
           </div>
         ) : (
           <div className="flex min-h-80 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 px-5 text-center">

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
+  ChevronRight,
   Menu,
   Search,
   ShoppingCart,
@@ -12,15 +13,34 @@ import {
 import { useAppSelector } from "@/hooks/redux";
 
 const navigationItems = [
-  { label: "Home", href: "/" },
-  { label: "Inventory", href: "/#products" },
-  { label: "Financing", href: "/#financing" },
-  { label: "Contact", href: "/#contact" },
+  {
+    label: "Home",
+    href: "/",
+  },
+  {
+    label: "Inventory",
+    href: "/#products",
+  },
+  {
+    label: "Financing",
+    href: "/#financing",
+  },
+  {
+    label: "Contact",
+    href: "/#contact",
+  },
 ];
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const cartItems = useAppSelector((state) => state.cart.items);
+  const [isMenuOpen, setIsMenuOpen] =
+    useState(false);
+
+  const [isPromoVisible, setIsPromoVisible] =
+    useState(true);
+
+  const cartItems = useAppSelector(
+    (state) => state.cart.items,
+  );
 
   const totalItems = cartItems.reduce(
     (total, item) => total + item.quantity,
@@ -32,86 +52,167 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-100 bg-white">
-      <nav className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:h-[72px] sm:px-8 lg:px-16">
-        <div className="flex items-center gap-12">
+    <header className="sticky top-0 z-50 bg-white">
+      {isPromoVisible && (
+        <div className="hidden h-8 border-b border-[#E5E7EB] bg-white md:block">
+          <div className="mx-auto flex h-full max-w-[1120px] items-center justify-center px-8">
+            <div className="flex items-center gap-2 text-[10px] text-slate-600">
+              <button
+                type="button"
+                onClick={() =>
+                  setIsPromoVisible(false)
+                }
+                aria-label="Close promotion"
+                className="flex h-4 w-4 items-center justify-center text-[#17365f] transition-colors hover:text-slate-900"
+              >
+                <X
+                  size={11}
+                  strokeWidth={2}
+                />
+              </button>
+
+              <span className="font-semibold text-slate-800">
+                Premium Selection
+              </span>
+
+              <span className="text-slate-400">
+                —
+              </span>
+
+              <span>
+                Certified Pre-Owned Vehicles
+              </span>
+
+              <Link
+                href="/#products"
+                className="inline-flex items-center gap-0.5 font-semibold text-[#17365f] hover:underline"
+              >
+                Browse Inventory
+
+                <ChevronRight
+                  size={11}
+                  strokeWidth={1.8}
+                />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+<div className="w-full border-b border-[#E5E7EB] bg-white">
+  <nav className="mx-auto flex h-[53px] w-full max-w-[1440px] items-center justify-between px-4 sm:h-[72px] sm:px-8 lg:px-16">        <div className="flex items-center gap-10">
           <Link
             href="/"
             onClick={closeMenu}
-            className="text-xl font-bold tracking-tight text-[#17365f] sm:text-2xl"
+            className="text-sm font-bold tracking-tight text-[#17365f] sm:text-xl"
           >
             TJERMIN
           </Link>
 
-          <div className="hidden items-center gap-8 md:flex">
-            {navigationItems.map((item, index) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={`text-sm transition-colors hover:text-[#17365f] ${
-                  index === 0
-                    ? "font-medium text-[#17365f]"
-                    : "text-slate-500"
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
+          <div className="hidden items-center gap-7 md:flex">
+            {navigationItems.map(
+              (item, index) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={`text-sm transition-colors hover:text-[#17365f] ${
+                    index === 0
+                      ? "font-medium text-[#17365f]"
+                      : "text-slate-500"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ),
+            )}
           </div>
         </div>
 
-        <div className="flex items-center gap-4 text-[#17365f] sm:gap-5">
+        <div className="flex items-center gap-1 text-[#17365f] sm:gap-3">
           <button
             type="button"
             aria-label="Search products"
-            className="transition-transform hover:scale-110"
+            className="flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-slate-100"
           >
-            <Search size={20} strokeWidth={1.8} />
+            <Search
+              size={17}
+              strokeWidth={1.8}
+            />
           </button>
 
           <button
             type="button"
             aria-label="User account"
-            className="hidden transition-transform hover:scale-110 sm:block"
+            className="hidden h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-slate-100 sm:flex"
           >
-            <UserRound size={20} strokeWidth={1.8} />
+            <UserRound
+              size={18}
+              strokeWidth={1.8}
+            />
           </button>
 
           <Link
             href="/cart"
             aria-label={`Shopping cart with ${totalItems} items`}
-            className="relative transition-transform hover:scale-110"
+            className="relative flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-slate-100"
           >
-            <ShoppingCart size={22} strokeWidth={1.8} />
+            <ShoppingCart
+              size={19}
+              strokeWidth={1.8}
+            />
 
             {totalItems > 0 && (
-              <span className="absolute -right-2.5 -top-2.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#17365f] px-1 text-[10px] font-semibold text-white">
-                {totalItems > 99 ? "99+" : totalItems}
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#17365f] px-1 text-[9px] font-bold leading-none text-white">
+                {totalItems > 9
+                  ? "9+"
+                  : totalItems}
               </span>
             )}
           </Link>
 
           <button
             type="button"
-            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            onClick={() =>
+              setIsMenuOpen(
+                (current) => !current,
+              )
+            }
+            aria-label={
+              isMenuOpen
+                ? "Close navigation menu"
+                : "Open navigation menu"
+            }
             aria-expanded={isMenuOpen}
-            onClick={() => setIsMenuOpen((current) => !current)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md hover:bg-slate-100 md:hidden"
+            className="flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-slate-100 md:hidden"
           >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {isMenuOpen ? (
+              <X
+                size={20}
+                strokeWidth={1.8}
+              />
+            ) : (
+              <Menu
+                size={20}
+                strokeWidth={1.8}
+              />
+            )}
           </button>
         </div>
       </nav>
-
+        </div>
+        
       {isMenuOpen && (
-        <div className="border-t border-slate-100 bg-white px-4 py-4 shadow-lg md:hidden">
-          <div className="mx-auto flex max-w-[1440px] flex-col">
+        <div className="border-b border-[#E5E7EB] bg-white px-4 py-3 shadow-lg md:hidden">
+          <nav
+            aria-label="Mobile navigation"
+            className="mx-auto flex flex-col"
+          >
             {navigationItems.map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
                 onClick={closeMenu}
-                className="rounded-md px-3 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-[#17365f]"
+                className="rounded-md px-3 py-3 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-[#17365f]"
               >
                 {item.label}
               </Link>
@@ -120,12 +221,12 @@ export default function Navbar() {
             <Link
               href="/account"
               onClick={closeMenu}
-              className="mt-2 flex items-center gap-3 border-t border-slate-100 px-3 pt-4 text-sm font-medium text-slate-700"
+              className="mt-2 flex items-center gap-3 border-t border-slate-100 px-3 pt-4 text-sm font-medium text-slate-600"
             >
-              <UserRound size={19} />
+              <UserRound size={18} />
               Account
             </Link>
-          </div>
+          </nav>
         </div>
       )}
     </header>

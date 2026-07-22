@@ -77,23 +77,16 @@ export default function FilterSidebar({
   return (
 <aside className="w-full min-w-0">      
     <button
-        type="button"
-        onClick={() => setIsMobileOpen((current) => !current)}
-        aria-expanded={isMobileOpen}
-        className="flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-[#17365f] lg:hidden"
-      >
-        <span className="flex items-center gap-2 font-semibold">
-          <Filter size={19} />
-          Filters
-        </span>
-
-        <ChevronDown
-          size={19}
-          className={`transition-transform ${
-            isMobileOpen ? "rotate-180" : ""
-          }`}
-        />
-      </button>
+  type="button"
+  onClick={() =>
+    setIsMobileOpen((current) => !current)
+  }
+  aria-expanded={isMobileOpen}
+  className="flex h-12 w-full items-center justify-center gap-2 rounded-md border-2 border-[#17365f] bg-white px-4 text-sm font-medium text-[#17365f] lg:hidden"
+>
+  <Filter size={17} strokeWidth={1.8} />
+  Filters & Sort
+</button>
 
       <div
         className={`mt-3 rounded-xl border border-slate-200 bg-white p-5 lg:mt-0 lg:block lg:border-0 lg:p-0 ${

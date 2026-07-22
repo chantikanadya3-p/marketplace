@@ -2,15 +2,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  ArrowLeft,
-  PackageCheck,
-  ShieldCheck,
-  Star,
-  Truck,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  Minus,
+  Plus,
 } from "lucide-react";
 import Navbar from "@/components/layout/navbar";
+import Footer from "@/components/layout/footer";
 import AddToCartButton from "@/components/product/add-to-cart-button";
+import ProductCard from "@/components/product/product-card";
 import { getProductById } from "@/lib/api/products";
+import type { Product } from "@/types/product";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -25,17 +29,61 @@ function formatPrice(price: number) {
   }).format(price);
 }
 
+async function getRelatedProducts(
+  currentProduct: Product,
+): Promise<Product[]> {
+  try {
+    const response = await fetch(
+      "https://fakestoreapi.com/products",
+      {
+        next: {
+          revalidate: 300,
+        },
+      },
+    );
+
+    if (!response.ok) return [];
+
+    const products: Product[] =
+      await response.json();
+
+    const sameCategory = products.filter(
+      (product) =>
+        product.id !== currentProduct.id &&
+        product.category ===
+          currentProduct.category,
+    );
+
+    const otherProducts = products.filter(
+      (product) =>
+        product.id !== currentProduct.id &&
+        product.category !==
+          currentProduct.category,
+    );
+
+    return [
+      ...sameCategory,
+      ...otherProducts,
+    ].slice(0, 4);
+  } catch {
+    return [];
+  }
+}
+
 export default async function ProductDetailPage({
   params,
 }: ProductDetailPageProps) {
   const { id } = await params;
   const productId = Number(id);
 
-  if (!Number.isInteger(productId) || productId <= 0) {
+  if (
+    !Number.isInteger(productId) ||
+    productId <= 0
+  ) {
     notFound();
   }
 
-  let product;
+  let product: Product;
 
   try {
     product = await getProductById(productId);
@@ -43,120 +91,267 @@ export default async function ProductDetailPage({
     notFound();
   }
 
+  const relatedProducts =
+    await getRelatedProducts(product);
+
   return (
     <>
       <Navbar />
 
-      <main className="mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-8 sm:py-12 lg:px-16">
-        <Link
-          href="/#products"
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition-colors hover:text-[#17365f]"
-        >
-          <ArrowLeft size={18} />
-          Back to products
-        </Link>
+      <main className="bg-white">
+        <div className="mx-auto w-full max-w-[1120px] px-4 py-5 sm:px-8 sm:py-8">
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-5 flex flex-wrap items-center gap-2 text-[11px] text-slate-500"
+          >
+            <Link
+              href="/"
+              className="hover:text-[#17365f]"
+            >
+              Home
+            </Link>
 
-        <section className="mt-7 grid gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="relative flex min-h-[360px] items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white p-8 sm:min-h-[520px] sm:p-12">
-            <Image
-              src={product.image}
-              alt={product.title}
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-contain p-10 sm:p-16"
-            />
-          </div>
+            <ChevronRight size={11} />
 
-          <div className="flex flex-col justify-center">
-            <p className="text-sm font-semibold uppercase tracking-wider text-[#17365f]">
-              {product.category}
-            </p>
+            <Link
+              href="/#products"
+              className="hover:text-[#17365f]"
+            >
+              Inventory
+            </Link>
 
-            <h1 className="mt-3 text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+            <ChevronRight size={11} />
+
+            <span className="font-medium text-[#17365f]">
               {product.title}
-            </h1>
+            </span>
+          </nav>
 
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-1 text-amber-400">
-                <Star size={19} fill="currentColor" />
-                <span className="font-semibold text-slate-800">
-                  {product.rating.rate}
+          <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10">
+            <div>
+              <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-slate-100">
+                <Image
+                  src={product.image}
+                  alt={product.title}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 55vw"
+                  className="object-contain p-10 sm:p-14"
+                />
+
+                <button
+                  type="button"
+                  aria-label="Previous product image"
+                  className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-[#17365f] shadow-md"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+
+                <button
+                  type="button"
+                  aria-label="Next product image"
+                  className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-[#17365f] shadow-md"
+                >
+                  <ChevronRight size={18} />
+                </button>
+
+                <span className="absolute bottom-3 right-3 rounded-full bg-slate-900/70 px-3 py-1 text-[10px] font-medium text-white">
+                  1/1
                 </span>
               </div>
 
-              <span className="text-sm text-slate-400">
-                {product.rating.count} customer reviews
-              </span>
+              <div className="mt-3 grid grid-cols-4 gap-3">
+                <button
+                  type="button"
+                  className="relative aspect-[4/3] overflow-hidden rounded-lg border-2 border-[#17365f] bg-slate-100"
+                >
+                  <Image
+                    src={product.image}
+                    alt={`${product.title} thumbnail`}
+                    fill
+                    sizes="160px"
+                    className="object-contain p-3"
+                  />
+                </button>
+              </div>
             </div>
 
-            <p className="mt-6 text-3xl font-bold text-[#17365f]">
-              {formatPrice(product.price)}
-            </p>
+            <div>
+              <h1 className="text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">
+                {product.title}
+              </h1>
 
-            <div className="my-7 border-t border-slate-200" />
+              <p className="mt-4 text-sm leading-6 text-slate-600">
+                {product.description}
+              </p>
 
-            <h2 className="text-base font-semibold text-slate-900">
-              Product description
-            </h2>
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <p className="text-2xl font-bold text-[#17365f] sm:text-3xl">
+                  {formatPrice(product.price)}
+                </p>
 
-            <p className="mt-3 text-base leading-7 text-slate-600">
-              {product.description}
-            </p>
+                <p className="text-sm text-slate-400 line-through">
+                  {formatPrice(
+                    product.price * 1.2,
+                  )}
+                </p>
+              </div>
 
-            <div className="mt-8">
-              <AddToCartButton product={product} />
-            </div>
+              <div className="mt-6">
+                <h2 className="text-xs font-semibold text-slate-900">
+                  Details
+                </h2>
 
-            <div className="mt-8 grid gap-3 border-t border-slate-200 pt-7 sm:grid-cols-3">
-              <div className="flex items-center gap-3">
-                <Truck
-                  size={22}
-                  className="shrink-0 text-[#17365f]"
-                />
-                <div>
-                  <p className="text-sm font-semibold text-slate-800">
-                    Fast delivery
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    Reliable shipping
-                  </p>
+                <p className="mt-2 text-xs text-slate-500">
+                  Premium quality • Unisex • Imported
+                </p>
+              </div>
+
+              <div className="mt-5">
+                <h2 className="text-xs font-semibold text-slate-900">
+                  Category
+                </h2>
+
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <span className="rounded-md border border-slate-300 bg-slate-50 px-3 py-1.5 text-[11px] font-medium capitalize text-[#17365f]">
+                    {product.category}
+                  </span>
+
+                  {product.rating.rate >= 4 && (
+                    <span className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[11px] font-medium text-emerald-600">
+                      Best Seller
+                    </span>
+                  )}
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <ShieldCheck
-                  size={22}
-                  className="shrink-0 text-[#17365f]"
-                />
-                <div>
-                  <p className="text-sm font-semibold text-slate-800">
-                    Secure payment
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    Protected checkout
-                  </p>
+              <div className="mt-6 flex gap-3">
+                <div className="flex h-11 shrink-0 overflow-hidden rounded-md border border-slate-200">
+                  <button
+                    type="button"
+                    aria-label="Decrease quantity"
+                    className="flex w-10 items-center justify-center text-slate-500 hover:bg-slate-50"
+                  >
+                    <Minus size={14} />
+                  </button>
+
+                  <span className="flex w-10 items-center justify-center border-x border-slate-200 text-sm font-medium text-slate-800">
+                    1
+                  </span>
+
+                  <button
+                    type="button"
+                    aria-label="Increase quantity"
+                    className="flex w-10 items-center justify-center text-slate-500 hover:bg-slate-50"
+                  >
+                    <Plus size={14} />
+                  </button>
                 </div>
+
+                <button
+                  type="button"
+                  className="flex h-11 flex-1 items-center justify-center gap-2 rounded-md border border-slate-300 text-xs font-medium text-[#17365f] hover:bg-slate-50"
+                >
+                  <Heart
+                    size={15}
+                    strokeWidth={1.8}
+                  />
+                  Wishlist
+                </button>
               </div>
 
-              <div className="flex items-center gap-3">
-                <PackageCheck
-                  size={22}
-                  className="shrink-0 text-[#17365f]"
-                />
-                <div>
-                  <p className="text-sm font-semibold text-slate-800">
-                    Easy returns
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    Simple return policy
-                  </p>
+              <div className="mt-3">
+                <AddToCartButton product={product} />
+              </div>
+
+              <dl className="mt-7 space-y-3 border-t border-slate-200 pt-5 text-xs">
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-slate-500">
+                    SKU:
+                  </dt>
+
+                  <dd className="font-medium text-slate-800">
+                    BT-{String(product.id).padStart(
+                      3,
+                      "0",
+                    )}
+                  </dd>
                 </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-slate-500">
+                    Material:
+                  </dt>
+
+                  <dd className="text-right font-medium text-slate-800">
+                    Premium Quality Material
+                  </dd>
+                </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-slate-500">
+                    Stock:
+                  </dt>
+
+                  <dd className="font-medium text-slate-800">
+                    In Stock ({product.rating.count})
+                  </dd>
+                </div>
+              </dl>
+
+              <div className="mt-6 border-t border-slate-200">
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-between border-b border-slate-200 py-4 text-xs font-medium text-slate-800"
+                >
+                  Additional Info
+                  <ChevronRight size={14} />
+                </button>
+
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-between border-b border-slate-200 py-4 text-xs font-medium text-slate-800"
+                >
+                  Details
+                  <ChevronDown size={14} />
+                </button>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+
+          {relatedProducts.length > 0 && (
+            <section className="mt-16 sm:mt-20">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-lg font-bold text-slate-900">
+                  You might also like
+                </h2>
+
+                <Link
+                  href="/#products"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-[#17365f] hover:underline"
+                >
+                  More Products
+                  <ChevronRight size={13} />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {relatedProducts.map(
+                  (relatedProduct, index) => (
+                    <ProductCard
+                      key={relatedProduct.id}
+                      product={relatedProduct}
+                      index={index}
+                    />
+                  ),
+                )}
+              </div>
+            </section>
+          )}
+        </div>
       </main>
+
+      <Footer />
     </>
   );
 }
