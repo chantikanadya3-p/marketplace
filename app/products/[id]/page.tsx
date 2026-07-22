@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Heart,
@@ -181,7 +180,7 @@ export default async function ProductDetailPage({
                 {product.title}
               </h1>
 
-              <p className="mt-4 text-sm leading-6 text-slate-600">
+              <p className="mt-4 text-sm font-normal leading-[22.75px] tracking-[-0.15px] text-[#64748B]">
                 {product.description}
               </p>
 
@@ -202,7 +201,7 @@ export default async function ProductDetailPage({
                   Details
                 </h2>
 
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="mt-2 text-sm font-normal leading-5 tracking-[-0.15px] text-[#64748B]">
                   Premium quality • Unisex • Imported
                 </p>
               </div>
@@ -308,13 +307,15 @@ export default async function ProductDetailPage({
                   <ChevronRight size={14} />
                 </button>
 
-                <button
-                  type="button"
-                  className="flex w-full items-center justify-between border-b border-slate-200 py-4 text-xs font-medium text-slate-800"
-                >
-                  Details
-                  <ChevronDown size={14} />
-                </button>
+              <button
+                type="button"
+                className="flex w-full items-center justify-between border-b border-slate-200 py-4 text-xs font-medium text-slate-800"
+              >
+                Details
+                <ChevronRight
+                  size={14}
+                />
+              </button>
               </div>
             </div>
           </section>

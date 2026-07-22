@@ -22,12 +22,6 @@ export default function Hero() {
           Find your perfect things from our premium selection.
         </p>
 
-        <Link
-          href="/#products"
-          className="mt-7 inline-flex min-h-11 items-center justify-center rounded-md border border-white px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-[#17365f] sm:mt-8 sm:px-6 sm:py-3"
-        >
-          Explore Products
-        </Link>
       </div>
     </section>
   );

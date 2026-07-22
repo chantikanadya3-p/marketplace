@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ChevronRight,
-  Heart,
   Star,
 } from "lucide-react";
 import type { Product } from "@/types/product";
@@ -26,7 +24,10 @@ interface ProductBadge {
   type: BadgeType;
 }
 
-const productBadges: Record<number, ProductBadge[]> = {
+const productBadges: Record<
+  number,
+  ProductBadge[]
+> = {
   3: [
     {
       label: "PROMO",
@@ -99,24 +100,26 @@ export default function ProductCard({
   product,
   index,
 }: ProductCardProps) {
-  const [isFavorite, setIsFavorite] =
-    useState(false);
-
-  const badges = productBadges[product.id] ?? [];
-
-  const handleFavorite = () => {
-    setIsFavorite((current) => !current);
-  };
+  const badges =
+    productBadges[product.id] ?? [];
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{
+        opacity: 0,
+        y: 16,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
       transition={{
         duration: 0.3,
         delay: Math.min(index * 0.04, 0.2),
       }}
-      whileHover={{ y: -3 }}
+      whileHover={{
+        y: -3,
+      }}
       className="group flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-slate-50">
@@ -147,35 +150,6 @@ export default function ProductCard({
             ))}
           </div>
         )}
-
-        <button
-          type="button"
-          onClick={handleFavorite}
-          aria-label={
-            isFavorite
-              ? `Remove ${product.title} from wishlist`
-              : `Add ${product.title} to wishlist`
-          }
-          title={
-            isFavorite
-              ? "Remove from wishlist"
-              : "Add to wishlist"
-          }
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md transition-transform hover:scale-105 sm:translate-y-1 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100"
-        >
-          <Heart
-            size={17}
-            strokeWidth={1.8}
-            fill={
-              isFavorite ? "currentColor" : "none"
-            }
-            className={
-              isFavorite
-                ? "text-rose-500"
-                : "text-[#17365f]"
-            }
-          />
-        </button>
       </div>
 
       <div className="flex flex-1 flex-col p-4">

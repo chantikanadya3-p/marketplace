@@ -1,6 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import {
+  useMemo,
+  useState,
+} from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   AlertCircle,
@@ -18,6 +21,9 @@ import ProductToolbar, {
   type ViewMode,
 } from "./product-toolbar";
 import type { Product } from "@/types/product";
+
+const INITIAL_PRODUCT_COUNT = 9;
+const LOAD_MORE_COUNT = 6;
 
 function isPriceInRange(
   price: number,
@@ -50,23 +56,29 @@ function sortProducts(
   switch (sortBy) {
     case "price-low":
       return sortedProducts.sort(
-        (first, second) => first.price - second.price,
+        (first, second) =>
+          first.price - second.price,
       );
 
     case "price-high":
       return sortedProducts.sort(
-        (first, second) => second.price - first.price,
+        (first, second) =>
+          second.price - first.price,
       );
 
     case "rating":
       return sortedProducts.sort(
         (first, second) =>
-          second.rating.rate - first.rating.rate,
+          second.rating.rate -
+          first.rating.rate,
       );
 
     case "name":
-      return sortedProducts.sort((first, second) =>
-        first.title.localeCompare(second.title),
+      return sortedProducts.sort(
+        (first, second) =>
+          first.title.localeCompare(
+            second.title,
+          ),
       );
 
     default:
@@ -87,18 +99,36 @@ function getGridClass(viewMode: ViewMode) {
   }
 }
 
-export default function ProductGrid() {
-  const [selectedCategory, setSelectedCategory] =
-    useState("all");
+function formatCategory(category: string) {
+  return category
+    .split(" ")
+    .map(
+      (word) =>
+        word.charAt(0).toUpperCase() +
+        word.slice(1),
+    )
+    .join(" ");
+}
 
-  const [selectedPriceRange, setSelectedPriceRange] =
-    useState<PriceRange>("all");
+export default function ProductGrid() {
+  const [
+    selectedCategory,
+    setSelectedCategory,
+  ] = useState("all");
+
+  const [
+    selectedPriceRange,
+    setSelectedPriceRange,
+  ] = useState<PriceRange>("all");
 
   const [sortBy, setSortBy] =
     useState<SortOption>("default");
 
   const [viewMode, setViewMode] =
     useState<ViewMode>("three-columns");
+
+  const [visibleCount, setVisibleCount] =
+    useState(INITIAL_PRODUCT_COUNT);
 
   const {
     data: products = [],
@@ -112,25 +142,38 @@ export default function ProductGrid() {
 
   const categories = useMemo(() => {
     return Array.from(
-      new Set(products.map((product) => product.category)),
+      new Set(
+        products.map(
+          (product) => product.category,
+        ),
+      ),
     ).sort();
   }, [products]);
 
   const displayedProducts = useMemo(() => {
-    const filteredProducts = products.filter((product) => {
-      const matchesCategory =
-        selectedCategory === "all" ||
-        product.category === selectedCategory;
+    const filteredProducts =
+      products.filter((product) => {
+        const matchesCategory =
+          selectedCategory === "all" ||
+          product.category ===
+            selectedCategory;
 
-      const matchesPrice = isPriceInRange(
-        product.price,
-        selectedPriceRange,
-      );
+        const matchesPrice =
+          isPriceInRange(
+            product.price,
+            selectedPriceRange,
+          );
 
-      return matchesCategory && matchesPrice;
-    });
+        return (
+          matchesCategory &&
+          matchesPrice
+        );
+      });
 
-    return sortProducts(filteredProducts, sortBy);
+    return sortProducts(
+      filteredProducts,
+      sortBy,
+    );
   }, [
     products,
     selectedCategory,
@@ -138,22 +181,62 @@ export default function ProductGrid() {
     sortBy,
   ]);
 
+  const visibleProducts =
+    displayedProducts.slice(
+      0,
+      visibleCount,
+    );
+
+  const categoryLabel =
+    selectedCategory === "all"
+      ? "All Category"
+      : formatCategory(selectedCategory);
+
+  const hasMoreProducts =
+    visibleCount <
+    displayedProducts.length;
+
+  const handleCategoryChange = (
+    category: string,
+  ) => {
+    setSelectedCategory(category);
+    setVisibleCount(
+      INITIAL_PRODUCT_COUNT,
+    );
+  };
+
+  const handlePriceRangeChange = (
+    range: PriceRange,
+  ) => {
+    setSelectedPriceRange(range);
+    setVisibleCount(
+      INITIAL_PRODUCT_COUNT,
+    );
+  };
+
+  const handleSortChange = (
+    option: SortOption,
+  ) => {
+    setSortBy(option);
+    setVisibleCount(
+      INITIAL_PRODUCT_COUNT,
+    );
+  };
+
   const handleReset = () => {
     setSelectedCategory("all");
     setSelectedPriceRange("all");
+    setVisibleCount(
+      INITIAL_PRODUCT_COUNT,
+    );
   };
 
-    const categoryLabel =
-    selectedCategory === "all"
-      ? "All Category"
-      : selectedCategory
-          .split(" ")
-          .map(
-            (word) =>
-              word.charAt(0).toUpperCase() +
-              word.slice(1),
-          )
-          .join(" ");
+  const handleShowMore = () => {
+    setVisibleCount(
+      (current) =>
+        current + LOAD_MORE_COUNT,
+    );
+  };
 
   if (isError) {
     return (
@@ -168,7 +251,8 @@ export default function ProductGrid() {
         </h3>
 
         <p className="mt-2 text-sm text-slate-500">
-          Please check your connection and try again.
+          Please check your connection and
+          try again.
         </p>
 
         <button
@@ -187,44 +271,82 @@ export default function ProductGrid() {
     <div className="grid items-start gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8">
       <FilterSidebar
         categories={categories}
-        selectedCategory={selectedCategory}
-        selectedPriceRange={selectedPriceRange}
-        onCategoryChange={setSelectedCategory}
-        onPriceRangeChange={setSelectedPriceRange}
+        selectedCategory={
+          selectedCategory
+        }
+        selectedPriceRange={
+          selectedPriceRange
+        }
+        onCategoryChange={
+          handleCategoryChange
+        }
+        onPriceRangeChange={
+          handlePriceRangeChange
+        }
         onReset={handleReset}
       />
 
       <div className="min-w-0">
         <ProductToolbar
-          resultCount={displayedProducts.length}
+          resultCount={
+            displayedProducts.length
+          }
           totalCount={products.length}
           categoryLabel={categoryLabel}
           sortBy={sortBy}
           viewMode={viewMode}
-          onSortChange={setSortBy}
+          onSortChange={
+            handleSortChange
+          }
           onViewChange={setViewMode}
         />
 
         {isPending ? (
-          <div className={getGridClass(viewMode)}>
-            {Array.from({ length: 6 }).map(
-              (_, index) => (
-                <ProductCardSkeleton key={index} />
-              ),
+          <div
+            className={getGridClass(
+              viewMode,
             )}
+          >
+            {Array.from({
+              length:
+                INITIAL_PRODUCT_COUNT,
+            }).map((_, index) => (
+              <ProductCardSkeleton
+                key={index}
+              />
+            ))}
           </div>
-        ) : displayedProducts.length > 0 ? (
-          <div className={getGridClass(viewMode)}>
-            {displayedProducts.map(
-              (product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  index={index}
-                />
-              ),
+        ) : displayedProducts.length >
+          0 ? (
+          <>
+            <div
+              className={getGridClass(
+                viewMode,
+              )}
+            >
+              {visibleProducts.map(
+                (product, index) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    index={index}
+                  />
+                ),
+              )}
+            </div>
+
+            {hasMoreProducts && (
+              <div className="mt-10 flex justify-center">
+                <button
+                  type="button"
+                  onClick={handleShowMore}
+                  className="inline-flex h-11 items-center justify-center rounded-md border-2 border-[#17365f] bg-white px-7 text-sm font-semibold text-[#17365f] transition-colors hover:bg-[#17365f] hover:text-white"
+                >
+                  Show More Products
+                </button>
+              </div>
             )}
-          </div>
+          </>
         ) : (
           <div className="flex min-h-80 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 px-5 text-center">
             <PackageSearch
@@ -237,7 +359,8 @@ export default function ProductGrid() {
             </h3>
 
             <p className="mt-2 text-sm text-slate-500">
-              Try selecting another category or price range.
+              Try selecting another category
+              or price range.
             </p>
 
             <button
