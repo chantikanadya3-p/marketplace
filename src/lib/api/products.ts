@@ -1,59 +1,59 @@
 import type { Product } from "@/types/product";
 
-const FAKE_STORE_API_URL = "https://fakestoreapi.com";
+const API_URL =
+  "https://fakestoreapi.com/products";
 
-export async function getProducts(): Promise<Product[]> {
-  const response = await fetch("/api/products");
+export async function getProducts(): Promise<
+  Product[]
+> {
+  const response = await fetch(API_URL);
 
   if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({ message: "Failed to fetch products" }));
-
-    throw new Error(error.message ?? "Failed to fetch products");
+    throw new Error(
+      `Failed to fetch products: ${response.status}`,
+    );
   }
 
-  return response.json();
+  const products: Product[] =
+    await response.json();
+
+  return products;
 }
 
 export async function getProductById(
   id: number,
 ): Promise<Product> {
   const response = await fetch(
-    `${FAKE_STORE_API_URL}/products/${id}`,
-    {
-      next: {
-        revalidate: 300,
-      },
-    },
+    `${API_URL}/${id}`,
   );
 
   if (!response.ok) {
-    throw new Error("Failed to fetch product");
+    throw new Error(
+      `Failed to fetch product: ${response.status}`,
+    );
   }
 
-  const product: Product | null = await response.json();
-
-  if (!product) {
-    throw new Error("Product not found");
-  }
+  const product: Product =
+    await response.json();
 
   return product;
 }
 
-export async function getCategories(): Promise<string[]> {
+export async function getCategories(): Promise<
+  string[]
+> {
   const response = await fetch(
-    `${FAKE_STORE_API_URL}/products/categories`,
-    {
-      next: {
-        revalidate: 300,
-      },
-    },
+    `${API_URL}/categories`,
   );
 
   if (!response.ok) {
-    throw new Error("Failed to fetch categories");
+    throw new Error(
+      `Failed to fetch categories: ${response.status}`,
+    );
   }
 
-  return response.json();
+  const categories: string[] =
+    await response.json();
+
+  return categories;
 }
