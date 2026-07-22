@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TJERMIN Marketplace
 
-## Getting Started
+A responsive marketplace catalog built with Next.js and the Fake Store API.
 
-First, run the development server:
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/chantikanadya3-p/marketplace.git
+```
+
+Open the project directory:
+
+```bash
+cd marketplace
+```
+
+Install the dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To create a production build:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+## Technologies Used
 
-To learn more about Next.js, take a look at the following resources:
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- TanStack Query
+- Redux Toolkit
+- Redux Persist
+- Framer Motion
+- Fake Store API
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Data Fetching
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+TanStack Query is used to fetch and cache product data on the catalog page. It also handles loading states, error states, retries, and background revalidation.
 
-## Deploy on Vercel
+The product detail page uses server-side data fetching with Next.js revalidation.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Cart Persistence and Hydration
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The shopping cart is managed with Redux Toolkit and persisted to browser `localStorage` using Redux Persist.
+
+Because `localStorage` is not available during server rendering, the persistence configuration only accesses browser storage when `window` is available. A no-operation storage fallback is used on the server.
+
+The application initially renders with the default Redux state. After the page runs in the browser, Redux Persist restores the saved cart state and updates components that depend on it, including the cart quantity badge. This prevents server-side storage access and reduces the risk of hydration mismatch.
