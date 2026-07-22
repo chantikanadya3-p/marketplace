@@ -61,3 +61,7 @@ The shopping cart is managed with Redux Toolkit and persisted to browser `localS
 Because `localStorage` is not available during server rendering, the persistence configuration only accesses browser storage when `window` is available. A no-operation storage fallback is used on the server.
 
 The application initially renders with the default Redux state. After the page runs in the browser, Redux Persist restores the saved cart state and updates components that depend on it, including the cart quantity badge. This prevents server-side storage access and reduces the risk of hydration mismatch.
+
+## Live Demo
+
+https://marketplace-xi-amber.vercel.app/
