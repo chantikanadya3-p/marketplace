@@ -1,23 +1,28 @@
 import { NextResponse } from "next/server";
-import type { Product } from "@/types/product";
 
-const FAKE_STORE_API_URL = "https://fakestoreapi.com";
+const API_URL =
+  "https://fakestoreapi.com/products";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const response = await fetch(
-      `${FAKE_STORE_API_URL}/products`,
-      {
-        next: {
-          revalidate: 300,
-        },
+    const response = await fetch(API_URL, {
+      headers: {
+        Accept: "application/json",
+        "User-Agent":
+          "Mozilla/5.0 TJERMIN-Marketplace/1.0",
       },
-    );
+      cache: "no-store",
+    });
 
     if (!response.ok) {
       return NextResponse.json(
         {
-          message: "Failed to fetch products from Fake Store API",
+          message:
+            "Failed to fetch products from Fake Store API",
+          status: response.status,
         },
         {
           status: response.status,
@@ -25,15 +30,24 @@ export async function GET() {
       );
     }
 
-    const products: Product[] = await response.json();
+    const products = await response.json();
 
-    return NextResponse.json(products);
+    return NextResponse.json(products, {
+      status: 200,
+      headers: {
+        "Cache-Control":
+          "public, s-maxage=300, stale-while-revalidate=600",
+      },
+    });
   } catch (error) {
-    console.error("Products API error:", error);
+    console.error(
+      "Products API route error:",
+      error,
+    );
 
     return NextResponse.json(
       {
-        message: "Unable to connect to Fake Store API",
+        message: "Unable to load products",
       },
       {
         status: 500,
