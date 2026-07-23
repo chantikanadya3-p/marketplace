@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ChevronRight,
+  Heart,
   Star,
 } from "lucide-react";
 import type { Product } from "@/types/product";
@@ -100,8 +102,18 @@ export default function ProductCard({
   product,
   index,
 }: ProductCardProps) {
+  const [isFavorite, setIsFavorite] =
+    useState(false);
+
   const badges =
     productBadges[product.id] ?? [];
+
+  const handleFavoriteClick = () => {
+    setIsFavorite(
+      (currentFavorite) =>
+        !currentFavorite,
+    );
+  };
 
   return (
     <motion.article
@@ -115,7 +127,10 @@ export default function ProductCard({
       }}
       transition={{
         duration: 0.3,
-        delay: Math.min(index * 0.04, 0.2),
+        delay: Math.min(
+          index * 0.04,
+          0.2,
+        ),
       }}
       whileHover={{
         y: -3,
@@ -137,7 +152,7 @@ export default function ProductCard({
         </Link>
 
         {badges.length > 0 && (
-          <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
+          <div className="absolute left-3 top-3 z-10 flex flex-col items-start gap-1.5">
             {badges.map((badge) => (
               <span
                 key={`${product.id}-${badge.label}`}
@@ -150,6 +165,28 @@ export default function ProductCard({
             ))}
           </div>
         )}
+
+        <button
+          type="button"
+          onClick={handleFavoriteClick}
+          aria-label={
+            isFavorite
+              ? `Remove ${product.title} from wishlist`
+              : `Add ${product.title} to wishlist`
+          }
+          aria-pressed={isFavorite}
+          className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-slate-100 bg-white text-[#17365f] shadow-sm transition-colors hover:bg-slate-50 sm:hidden"
+        >
+          <Heart
+            size={15}
+            strokeWidth={1.8}
+            fill={
+              isFavorite
+                ? "currentColor"
+                : "none"
+            }
+          />
+        </button>
       </div>
 
       <div className="flex flex-1 flex-col p-4">
@@ -157,16 +194,16 @@ export default function ProductCard({
           className="flex items-center gap-1 text-amber-400"
           aria-label={`Rating ${product.rating.rate} out of 5`}
         >
-          {Array.from({ length: 5 }).map(
-            (_, starIndex) => (
-              <Star
-                key={starIndex}
-                size={12}
-                strokeWidth={1.5}
-                fill="currentColor"
-              />
-            ),
-          )}
+          {Array.from({
+            length: 5,
+          }).map((_, starIndex) => (
+            <Star
+              key={starIndex}
+              size={12}
+              strokeWidth={1.5}
+              fill="currentColor"
+            />
+          ))}
         </div>
 
         <Link
@@ -197,7 +234,9 @@ export default function ProductCard({
               </p>
 
               <p className="truncate text-base font-bold text-[#17365f]">
-                {formatPrice(product.price)}
+                {formatPrice(
+                  product.price,
+                )}
               </p>
             </div>
 

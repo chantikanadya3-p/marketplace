@@ -168,8 +168,8 @@ export default function Navbar() {
                 strokeWidth={1.8}
               />
 
-             {totalItems > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#17365f] px-1 text-[10px] font-bold leading-none text-white">
+              {totalItems > 0 && (
+                <span className="absolute right-0 top-0 flex h-4 min-w-4 translate-x-[15%] -translate-y-[5%] items-center justify-center rounded-full bg-[#17365f] px-1 text-[9px] font-bold leading-none text-white sm:h-[18px] sm:min-w-[18px] sm:text-[10px]">
                   {displayedCartCount}
                 </span>
               )}
