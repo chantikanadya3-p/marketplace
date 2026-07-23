@@ -12,7 +12,7 @@ import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import AddToCartButton from "@/components/product/add-to-cart-button";
 import ProductCard from "@/components/product/product-card";
-import { getProductById } from "@/lib/api/products";
+import productData from "@/data/products.json";
 import type { Product } from "@/types/product";
 
 interface ProductDetailPageProps {
@@ -21,6 +21,8 @@ interface ProductDetailPageProps {
   }>;
 }
 
+const products = productData as Product[];
+
 function formatPrice(price: number) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -28,45 +30,27 @@ function formatPrice(price: number) {
   }).format(price);
 }
 
-async function getRelatedProducts(
+function getRelatedProducts(
   currentProduct: Product,
-): Promise<Product[]> {
-  try {
-    const response = await fetch(
-      "https://fakestoreapi.com/products",
-      {
-        next: {
-          revalidate: 300,
-        },
-      },
-    );
+): Product[] {
+  const sameCategory = products.filter(
+    (product) =>
+      product.id !== currentProduct.id &&
+      product.category ===
+        currentProduct.category,
+  );
 
-    if (!response.ok) return [];
+  const otherProducts = products.filter(
+    (product) =>
+      product.id !== currentProduct.id &&
+      product.category !==
+        currentProduct.category,
+  );
 
-    const products: Product[] =
-      await response.json();
-
-    const sameCategory = products.filter(
-      (product) =>
-        product.id !== currentProduct.id &&
-        product.category ===
-          currentProduct.category,
-    );
-
-    const otherProducts = products.filter(
-      (product) =>
-        product.id !== currentProduct.id &&
-        product.category !==
-          currentProduct.category,
-    );
-
-    return [
-      ...sameCategory,
-      ...otherProducts,
-    ].slice(0, 4);
-  } catch {
-    return [];
-  }
+  return [
+    ...sameCategory,
+    ...otherProducts,
+  ].slice(0, 4);
 }
 
 export default async function ProductDetailPage({
@@ -82,16 +66,16 @@ export default async function ProductDetailPage({
     notFound();
   }
 
-  let product: Product;
+  const product = products.find(
+    (item) => item.id === productId,
+  );
 
-  try {
-    product = await getProductById(productId);
-  } catch {
+  if (!product) {
     notFound();
   }
 
   const relatedProducts =
-    await getRelatedProducts(product);
+    getRelatedProducts(product);
 
   return (
     <>
