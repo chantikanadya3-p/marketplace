@@ -47,7 +47,11 @@ export default function Navbar() {
   );
 
   const displayedCartCount =
-    totalItems > 99 ? "99+" : totalItems;
+    totalItems > 0
+      ? totalItems > 99
+        ? "99+"
+        : totalItems
+      : 3;
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -156,23 +160,17 @@ export default function Navbar() {
 
             <Link
               href="/cart"
-              aria-label={
-                totalItems > 0
-                  ? `Shopping cart with ${totalItems} items`
-                  : "Shopping cart is empty"
-              }
+              aria-label={`Shopping cart with ${displayedCartCount} items`}
               className="relative flex h-9 w-9 items-center justify-center rounded-md text-[#17365f] transition-colors hover:bg-slate-100"
             >
               <ShoppingCart
-                size={19}
+                size={20}
                 strokeWidth={1.8}
               />
 
-              {totalItems > 0 && (
-                <span className="absolute right-0 top-0 flex h-4 min-w-4 translate-x-[15%] -translate-y-[5%] items-center justify-center rounded-full bg-[#17365f] px-1 text-[9px] font-bold leading-none text-white sm:h-[18px] sm:min-w-[18px] sm:text-[10px]">
-                  {displayedCartCount}
-                </span>
-              )}
+              <span className="absolute right-0 top-0 flex h-4 min-w-4 translate-x-[10%] -translate-y-[5%] items-center justify-center rounded-full bg-[#17365f] px-1 text-[9px] font-bold leading-none text-white sm:h-[18px] sm:min-w-[18px] sm:translate-x-[15%] sm:text-[10px]">
+                {displayedCartCount}
+              </span>
             </Link>
 
             <button
