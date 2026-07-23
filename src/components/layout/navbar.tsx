@@ -60,52 +60,71 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-white">
       {isPromoVisible && (
-        <div className="hidden h-8 border-b border-[#E5E7EB] bg-white md:block">
-          <div className="mx-auto flex h-full max-w-[1120px] items-center justify-center px-8">
-            <div className="flex items-center gap-2 text-[10px] text-slate-600">
-              <button
-                type="button"
-                onClick={() =>
-                  setIsPromoVisible(false)
-                }
-                aria-label="Close promotion"
-                className="flex h-4 w-4 items-center justify-center text-[#17365f] transition-colors hover:text-slate-900"
-              >
-                <X
-                  size={11}
-                  strokeWidth={2}
-                />
-              </button>
+      <div className="h-11 border-b border-[#E5E7EB] bg-[#F8FAFC] md:h-8 md:bg-white">
+        <div className="mx-auto flex h-full w-full max-w-[1120px] items-center justify-center px-4 sm:px-8">
+          {/* Mobile promotion */}
+          <div className="flex items-center justify-center gap-6 text-sm md:hidden">
+            <span className="font-semibold text-slate-800">
+              Premium Selection
+            </span>
 
-              <span className="font-semibold text-slate-800">
-                Premium Selection
-              </span>
+            <Link
+              href="/#products"
+              className="inline-flex items-center gap-1 font-medium text-[#17365f]"
+            >
+              Browse
 
-              <span className="text-slate-400">
-                —
-              </span>
+              <ChevronRight
+                size={16}
+                strokeWidth={1.8}
+              />
+            </Link>
+          </div>
 
-              <span>
-                Certified Pre-Owned Vehicles
-              </span>
+          <div className="hidden items-center gap-2 text-[10px] text-slate-600 md:flex">
+            <button
+              type="button"
+              onClick={() =>
+                setIsPromoVisible(false)
+              }
+              aria-label="Close promotion"
+              className="flex h-4 w-4 items-center justify-center text-[#17365f] transition-colors hover:text-slate-900"
+            >
+              <X
+                size={11}
+                strokeWidth={2}
+              />
+            </button>
 
-              <Link
-                href="/#products"
-                className="inline-flex items-center gap-0.5 font-semibold text-[#17365f] hover:underline"
-              >
-                Browse Inventory
+            <span className="font-semibold text-slate-800">
+              Premium Selection
+            </span>
 
-                <ChevronRight
-                  size={11}
-                  strokeWidth={1.8}
-                />
-              </Link>
-            </div>
+            <span className="text-slate-400">
+              —
+            </span>
+
+            <span>
+              Certified Pre-Owned Vehicles
+            </span>
+
+            <Link
+              href="/#products"
+              className="inline-flex items-center gap-0.5 font-semibold text-[#17365f] hover:underline"
+            >
+              Browse Inventory
+
+              <ChevronRight
+                size={11}
+                strokeWidth={1.8}
+              />
+            </Link>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
-      <div className="w-full border-b border-[#E5E7EB] bg-white">
+      <div className="relative z-10 w-full border-b border-[#E5E7EB] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.10),0_1px_3px_rgba(0,0,0,0.10)]">
         <nav className="mx-auto flex h-[53px] w-full max-w-[1440px] items-center justify-between px-4 sm:h-[72px] sm:px-8 lg:px-16">
           <div className="flex items-center gap-10">
             <Link
