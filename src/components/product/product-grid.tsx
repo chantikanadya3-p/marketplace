@@ -4,6 +4,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   AlertCircle,
@@ -23,7 +24,7 @@ import ProductToolbar, {
 import type { Product } from "@/types/product";
 
 const INITIAL_PRODUCT_COUNT = 9;
-const LOAD_MORE_COUNT = 6;
+const PRODUCT_INCREMENT = 6;
 
 function isPriceInRange(
   price: number,
@@ -86,7 +87,9 @@ function sortProducts(
   }
 }
 
-function getGridClass(viewMode: ViewMode) {
+function getGridClass(
+  viewMode: ViewMode,
+) {
   switch (viewMode) {
     case "two-columns":
       return "grid grid-cols-1 gap-5 sm:grid-cols-2";
@@ -99,7 +102,13 @@ function getGridClass(viewMode: ViewMode) {
   }
 }
 
-function formatCategory(category: string) {
+function formatCategoryLabel(
+  category: string,
+) {
+  if (category === "all") {
+    return "All Category";
+  }
+
   return category
     .split(" ")
     .map(
@@ -111,6 +120,14 @@ function formatCategory(category: string) {
 }
 
 export default function ProductGrid() {
+  const searchParams = useSearchParams();
+
+  const searchQuery = (
+    searchParams.get("search") ?? ""
+  )
+    .trim()
+    .toLowerCase();
+
   const [
     selectedCategory,
     setSelectedCategory,
@@ -144,7 +161,8 @@ export default function ProductGrid() {
     return Array.from(
       new Set(
         products.map(
-          (product) => product.category,
+          (product) =>
+            product.category,
         ),
       ),
     ).sort();
@@ -164,9 +182,16 @@ export default function ProductGrid() {
             selectedPriceRange,
           );
 
+        const matchesSearch =
+          searchQuery.length === 0 ||
+          product.title
+            .toLowerCase()
+            .includes(searchQuery);
+
         return (
           matchesCategory &&
-          matchesPrice
+          matchesPrice &&
+          matchesSearch
         );
       });
 
@@ -179,6 +204,7 @@ export default function ProductGrid() {
     selectedCategory,
     selectedPriceRange,
     sortBy,
+    searchQuery,
   ]);
 
   const visibleProducts =
@@ -187,14 +213,18 @@ export default function ProductGrid() {
       visibleCount,
     );
 
-  const categoryLabel =
-    selectedCategory === "all"
-      ? "All Category"
-      : formatCategory(selectedCategory);
-
   const hasMoreProducts =
     visibleCount <
     displayedProducts.length;
+
+  const categoryLabel =
+    searchQuery.length > 0
+      ? `Search: "${searchParams.get(
+          "search",
+        )}"`
+      : formatCategoryLabel(
+          selectedCategory,
+        );
 
   const handleCategoryChange = (
     category: string,
@@ -206,18 +236,18 @@ export default function ProductGrid() {
   };
 
   const handlePriceRangeChange = (
-    range: PriceRange,
+    priceRange: PriceRange,
   ) => {
-    setSelectedPriceRange(range);
+    setSelectedPriceRange(priceRange);
     setVisibleCount(
       INITIAL_PRODUCT_COUNT,
     );
   };
 
   const handleSortChange = (
-    option: SortOption,
+    sortOption: SortOption,
   ) => {
-    setSortBy(option);
+    setSortBy(sortOption);
     setVisibleCount(
       INITIAL_PRODUCT_COUNT,
     );
@@ -226,15 +256,22 @@ export default function ProductGrid() {
   const handleReset = () => {
     setSelectedCategory("all");
     setSelectedPriceRange("all");
+    setSortBy("default");
     setVisibleCount(
       INITIAL_PRODUCT_COUNT,
     );
+
+    if (searchQuery) {
+      window.location.href =
+        "/#products";
+    }
   };
 
   const handleShowMore = () => {
     setVisibleCount(
-      (current) =>
-        current + LOAD_MORE_COUNT,
+      (currentCount) =>
+        currentCount +
+        PRODUCT_INCREMENT,
     );
   };
 
@@ -258,7 +295,7 @@ export default function ProductGrid() {
         <button
           type="button"
           onClick={() => refetch()}
-          className="mt-5 inline-flex items-center gap-2 rounded-md bg-[#17365f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#102947]"
+          className="mt-5 inline-flex items-center gap-2 rounded-md bg-[#17365f] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#102947]"
         >
           <RefreshCcw size={16} />
           Try again
@@ -308,15 +345,14 @@ export default function ProductGrid() {
             )}
           >
             {Array.from({
-              length:
-                INITIAL_PRODUCT_COUNT,
+              length: 6,
             }).map((_, index) => (
               <ProductCardSkeleton
                 key={index}
               />
             ))}
           </div>
-        ) : displayedProducts.length >
+        ) : visibleProducts.length >
           0 ? (
           <>
             <div
@@ -340,7 +376,7 @@ export default function ProductGrid() {
                 <button
                   type="button"
                   onClick={handleShowMore}
-                  className="inline-flex h-11 items-center justify-center rounded-md border-2 border-[#17365f] bg-white px-7 text-sm font-semibold text-[#17365f] transition-colors hover:bg-[#17365f] hover:text-white"
+                  className="h-11 rounded-md border-2 border-[#17365f] bg-white px-7 text-sm font-semibold text-[#17365f] transition-colors hover:bg-[#17365f] hover:text-white"
                 >
                   Show More Products
                 </button>
@@ -359,14 +395,17 @@ export default function ProductGrid() {
             </h3>
 
             <p className="mt-2 text-sm text-slate-500">
-              Try selecting another category
-              or price range.
+              {searchQuery
+                ? `No product matches "${searchParams.get(
+                    "search",
+                  )}".`
+                : "Try selecting another category or price range."}
             </p>
 
             <button
               type="button"
               onClick={handleReset}
-              className="mt-5 rounded-md bg-[#17365f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#102947]"
+              className="mt-5 rounded-md bg-[#17365f] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#102947]"
             >
               Reset filters
             </button>

@@ -27,38 +27,59 @@ export default function AddToCartButton({
 
     window.setTimeout(() => {
       setIsAdded(false);
-    }, 1500);
+    }, 1600);
   };
 
   return (
     <motion.button
       type="button"
-      whileTap={{ scale: 0.98 }}
       onClick={handleAddToCart}
-      disabled={isAdded}
-      className={`flex h-12 w-full items-center justify-center gap-2 rounded-md px-6 text-sm font-semibold text-white transition-colors ${
+      whileHover={{
+        scale: 1.01,
+      }}
+      whileTap={{
+        scale: 0.97,
+      }}
+      animate={
         isAdded
-          ? "bg-emerald-500"
-          : "bg-[#17365f] hover:bg-[#102947]"
-      }`}
+          ? {
+              backgroundColor: "#059669",
+            }
+          : {
+              backgroundColor: "#17365f",
+            }
+      }
+      transition={{
+        duration: 0.2,
+      }}
+      className="flex h-11 w-full items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold text-white shadow-sm"
     >
-      {isAdded ? (
-        <>
-          <Check
-            size={18}
-            strokeWidth={2.5}
-          />
-          Added to Cart
-        </>
-      ) : (
-        <>
-          <ShoppingCart
-            size={18}
-            strokeWidth={1.8}
-          />
-          Add to Cart
-        </>
-      )}
+      <motion.span
+        key={isAdded ? "added" : "cart"}
+        initial={{
+          opacity: 0,
+          scale: 0.7,
+          y: 3,
+        }}
+        animate={{
+          opacity: 1,
+          scale: 1,
+          y: 0,
+        }}
+        className="flex items-center gap-2"
+      >
+        {isAdded ? (
+          <>
+            <Check size={17} />
+            Added to Cart
+          </>
+        ) : (
+          <>
+            <ShoppingCart size={17} />
+            Add to Cart
+          </>
+        )}
+      </motion.span>
     </motion.button>
   );
 }

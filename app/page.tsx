@@ -1,28 +1,50 @@
-import Hero from "@/components/layout/hero";
+import { Suspense } from "react";
 import Navbar from "@/components/layout/navbar";
-import ProductGrid from "@/components/product/product-grid";
-import Footer from "@/components/layout/footer";
+import Hero from "@/components/layout/hero";
 import Newsletter from "@/components/layout/newsletter";
+import Footer from "@/components/layout/footer";
+import ProductGrid from "@/components/product/product-grid";
+import ProductCardSkeleton from "@/components/product/product-card-skeleton";
 
-export default function Home() {
+function ProductGridFallback() {
   return (
-  <>
-    <Navbar />
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({
+        length: 6,
+      }).map((_, index) => (
+        <ProductCardSkeleton
+          key={index}
+        />
+      ))}
+    </div>
+  );
+}
 
-    <main className="overflow-x-hidden">
+export default function HomePage() {
+  return (
+    <>
+      <Navbar />
+
       <Hero />
 
-      <section
-  id="products"
-  className="mx-auto w-full max-w-[1440px] px-4 py-4 sm:px-8 sm:py-8 lg:px-16 lg:py-12"
->
-  <ProductGrid />
-</section>
+      <main
+        id="products"
+        className="bg-white"
+      >
+        <div className="mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-8 sm:py-12 lg:px-16">
+          <Suspense
+            fallback={
+              <ProductGridFallback />
+            }
+          >
+            <ProductGrid />
+          </Suspense>
+        </div>
+      </main>
 
       <Newsletter />
-    </main>
 
-    <Footer />
-  </>
-);
+      <Footer />
+    </>
+  );
 }

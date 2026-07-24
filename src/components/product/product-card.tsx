@@ -9,6 +9,8 @@ import {
   Heart,
   Star,
 } from "lucide-react";
+import { addToCart } from "@/features/cart/cart-slice";
+import { useAppDispatch } from "@/hooks/redux";
 import type { Product } from "@/types/product";
 
 interface ProductCardProps {
@@ -36,12 +38,14 @@ const productBadges: Record<
       type: "promo",
     },
   ],
+
   5: [
     {
       label: "PREMIUM",
       type: "premium",
     },
   ],
+
   7: [
     {
       label: "BEST DEAL",
@@ -52,24 +56,28 @@ const productBadges: Record<
       type: "promo",
     },
   ],
+
   9: [
     {
       label: "PROMO",
       type: "promo",
     },
   ],
+
   12: [
     {
       label: "PREMIUM",
       type: "premium",
     },
   ],
+
   15: [
     {
       label: "BEST DEAL",
       type: "best-deal",
     },
   ],
+
   18: [
     {
       label: "PROMO",
@@ -102,17 +110,22 @@ export default function ProductCard({
   product,
   index,
 }: ProductCardProps) {
-  const [isFavorite, setIsFavorite] =
+  const dispatch = useAppDispatch();
+
+  const [isAdded, setIsAdded] =
     useState(false);
 
   const badges =
     productBadges[product.id] ?? [];
 
-  const handleFavoriteClick = () => {
-    setIsFavorite(
-      (currentFavorite) =>
-        !currentFavorite,
-    );
+  const handleAddToCart = () => {
+    dispatch(addToCart(product));
+
+    setIsAdded(true);
+
+    window.setTimeout(() => {
+      setIsAdded(false);
+    }, 1500);
   };
 
   return (
@@ -152,7 +165,7 @@ export default function ProductCard({
         </Link>
 
         {badges.length > 0 && (
-          <div className="absolute left-3 top-3 z-10 flex flex-col items-start gap-1.5">
+          <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
             {badges.map((badge) => (
               <span
                 key={`${product.id}-${badge.label}`}
@@ -166,27 +179,74 @@ export default function ProductCard({
           </div>
         )}
 
-        <button
+        <motion.button
           type="button"
-          onClick={handleFavoriteClick}
-          aria-label={
-            isFavorite
-              ? `Remove ${product.title} from wishlist`
-              : `Add ${product.title} to wishlist`
+          onClick={handleAddToCart}
+          whileHover={{
+            scale: 1.08,
+          }}
+          whileTap={{
+            scale: 0.85,
+          }}
+          animate={
+            isAdded
+              ? {
+                  scale: [1, 1.25, 1],
+                }
+              : {
+                  scale: 1,
+                }
           }
-          aria-pressed={isFavorite}
-          className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-slate-100 bg-white text-[#17365f] shadow-sm transition-colors hover:bg-slate-50 sm:hidden"
+          transition={{
+            duration: 0.25,
+          }}
+          aria-label={
+            isAdded
+              ? `${product.title} added to cart`
+              : `Add ${product.title} to cart`
+          }
+          title={
+            isAdded
+              ? "Added to cart"
+              : "Add to cart"
+          }
+          className={`absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border bg-white shadow-md transition-colors ${
+            isAdded
+              ? "border-[#17365f] text-[#17365f]"
+              : "border-slate-200 text-slate-500 hover:border-[#17365f] hover:text-[#17365f]"
+          }`}
         >
           <Heart
-            size={15}
+            size={17}
             strokeWidth={1.8}
             fill={
-              isFavorite
+              isAdded
                 ? "currentColor"
                 : "none"
             }
           />
-        </button>
+        </motion.button>
+
+        {isAdded && (
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: -4,
+              scale: 0.9,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+            }}
+            exit={{
+              opacity: 0,
+            }}
+            className="absolute bottom-3 right-3 rounded-md bg-[#17365f] px-3 py-1.5 text-[10px] font-semibold text-white shadow-md"
+          >
+            Added to cart
+          </motion.div>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col p-4">
@@ -234,9 +294,7 @@ export default function ProductCard({
               </p>
 
               <p className="truncate text-base font-bold text-[#17365f]">
-                {formatPrice(
-                  product.price,
-                )}
+                {formatPrice(product.price)}
               </p>
             </div>
 
